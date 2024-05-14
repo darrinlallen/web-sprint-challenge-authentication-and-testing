@@ -4,38 +4,41 @@ const restrictMe = require('../middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
-router.post('/register', restrictMe,  (req, res, next) => {
-  let user = req.body
-  const hash = bcrypt.hashSync(user.password, 8) // 2 ^ n
-  user.password = hash
+router.post('/register', restrictMe, async (req, res, next) => {
+  try {
+    const user = req.body;
+    const hash = await bcrypt.hash(user.password, 8); // Hash the password asynchronously
+    user.password = hash;
 
-  Users.add(user)
-    .then(saved => {
-      res.status(201).json({saved})
-    })
-    .catch(next) // our custom err handling middleware will trap this
-})
+    // Add user to the database
+    const savedUser = await Users.add(user);
 
-// for endpoints beginning with /api/auth
-router.post('/register', restrictMe, (req, res, next) => {
-  let user = req.body;
-  const hash = bcrypt.hashSync(user.password, 8); // 2 ^ n
-  user.password = hash;
-
-  Users.add(user)
-    .then(saved => {
-      res.status(201).json({ saved });
-    })
-    .catch(error => {
-      // Check if the error is related to a duplicate username
-      if (error.message.includes('duplicate key value violates unique constraint')) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-      // If it's another type of error, pass it to the error handling middleware
-      next(error);
-    });
+    // Respond with the saved user
+    res.status(201).json(savedUser);
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 });
 
+
+router.post('/login', (req, res, next) => {
+  let { username, password } = req.body
+
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        // this is the critical line. Session saved, cookie set on client:
+        req.session.user = user
+        res.status(200).json({
+          message: `welcome, ${user.username}`})
+      } else {
+        next({ status: 401, message: 'Invalid Credentials' })
+      }
+    })
+    .catch(next)
+})
 
   /*
     IMPLEMENT
