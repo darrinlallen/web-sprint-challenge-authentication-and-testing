@@ -1,10 +1,10 @@
-const router = require('express').Router()
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const router = require('express').Router();
 
 const Users = require('../users-model.js')
 
 // for endpoints beginning with /api/auth
-router.post('api/auth/register', (req, res, next) => {
+router.post('/register', (req, res, next) => {
   let user = req.body
   const hash = bcrypt.hashSync(user.password, 8) // 2 ^ n
   user.password = hash
@@ -18,7 +18,7 @@ router.post('api/auth/register', (req, res, next) => {
     .catch(next) // our custom err handling middleware will trap this
 })
 
-router.post('api/auth/login', (req, res, next) => {
+router.post('/login', (req, res, next) => {
   let { username, password } = req.body
 
   Users.findBy({ username })
