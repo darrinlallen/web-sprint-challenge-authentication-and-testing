@@ -4,17 +4,22 @@ const restrictMe = require('../middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
-router.post('/register', restrictMe, async (req, res, next) => {
+router.post('/register', async (req, res, next) => {
   try {
-    const user = req.body;
-    const hash = await bcrypt.hash(user.password, 8); // Hash the password asynchronously
-    user.password = hash;
+    // Call restrictMe middleware
+    restrictMe(req, res, async () => {
+      // This function is called when restrictMe middleware calls next()
+      // Now you're back in the route handler
+      const user = req.body;
+      const hash = await bcrypt.hash(user.password, 8); // Hash the password asynchronously
+      user.password = hash;
 
-    // Add user to the database
-    const savedUser = await Users.add(user);
+      // Add user to the database
+      const savedUser = await Users.add(user);
 
-    // Respond with the saved user
-    res.status(201).json(savedUser);
+      // Respond with the saved user
+      res.status(201).json(savedUser);
+    });
   } catch (error) {
     // Pass the error to the error handling middleware
     next(error);
