@@ -1,11 +1,28 @@
+
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
-const restricted = require('../middleware/restricted.js')
-const Users = require('./users-model.js')
+const Users = require('./users-model.js');
 
-// for endpoints beginning with /api/auth
+// Middleware to check if username and password are provided
+const restrictMe = (req, res, next) => {
+  try {
+    const { username, password } = req.body;
 
-router.post('/register', async (req, res, next) => {
+    // Perform validation or checks here
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    // If validation passes, call next() to pass control to the next middleware/route handler
+    next();
+  } catch (error) {
+    // If an error occurs, pass it to the error handling middleware
+    next(error);
+  }
+};
+
+// Route handler for user registration
+router.post('/register', restrictMe, async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -16,112 +33,40 @@ router.post('/register', async (req, res, next) => {
       return res.status(400).json({ message: 'Username already taken' });
     }
 
-    // Call restrictMe middleware
-    restricted(req, res, async () => {
-      // This function is called when restrictMe middleware calls next()
-      // Now you're back in the route handler
+    // Hash the password asynchronously
+    const hash = await bcrypt.hash(password, 8);
+    const newUser = { username, password: hash };
 
-      // Hash the password asynchronously
-      const hash = await bcrypt.hash(password, 8);
-      const newUser = { username, password: hash };
+    // Add user to the database
+    const savedUser = await Users.add(newUser);
 
-      // Add user to the database
-      const savedUser = await Users.add(newUser);
-
-      // Respond with the saved user
-      res.status(201).json(savedUser);
-    });
+    // Respond with the saved user
+    res.status(201).json(savedUser);
   } catch (error) {
     // Pass the error to the error handling middleware
     next(error);
   }
 });
 
-router.post('/login', (req, res, next) => {
-  let { username, password } = req.body;
+// Route handler for user login
+router.post('/login', async (req, res, next) => {
+  try {
+    let { username, password } = req.body;
 
-  Users.findBy({ username })
-    .first()
-    .then(user => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        // Session saved, cookie set on client:
-        req.session.user = user;
-        res.status(200).json({
-          message: `Welcome, ${user.username}`
-        });
-      } else {
-        next({ status: 401, message: 'Invalid Credentials' });
-      }
-    })
-    .catch(next);
+    const user = await Users.findBy({ username }).first();
+
+    if (user && bcrypt.compareSync(password, user.password)) {
+      // Session saved, cookie set on client
+      req.session.user = user;
+      return res.status(200).json({ message: `Welcome, ${user.username}` });
+    }
+
+    // If username doesn't exist or password is incorrect
+    res.status(401).json({ message: 'Invalid credentials' });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 });
-
-router.post('/login', (req, res, next) => {
-  let { username, password } = req.body
-
-  Users.findBy({ username })
-    .first()
-    .then(user => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        // this is the critical line. Session saved, cookie set on client:
-        req.session.user = user
-        res.status(200).json({
-          message: `welcome, ${user.username}`})
-      } else {
-        next({ status: 401, message: 'Invalid Credentials' })
-      }
-    })
-    .catch(next)
-})
-
-  /*
-    IMPLEMENT
-    You are welcome to build additional middlewares to help with the endpoint's functionality.
-    DO NOT EXCEED 2^8 ROUNDS OF HASHING!
-
-    1- In order to register a new account the client must provide `username` and `password`:
-      {
-        "username": "Captain Marvel", // must not exist already in the `users` table
-        "password": "foobar"          // needs to be hashed before it's saved
-      }
-
-    2- On SUCCESSFUL registration,
-      the response body should have `id`, `username` and `password`:
-      {
-        "id": 1,
-        "username": "Captain Marvel",
-        "password": "2a$08$jG.wIGR2S4hxuyWNcBf9MuoC4y0dNy7qC/LbmtuFBSdIhWks2LhpG"
-      }
-
-    3- On FAILED registration due to `username` or `password` missing from the request body,
-      the response body should include a string exactly as follows: "username and password required".
-
-    4- On FAILED registration due to the `username` being taken,
-      the response body should include a string exactly as follows: "username taken".
-  */
-  /*
-    IMPLEMENT
-    You are welcome to build additional middlewares to help with the endpoint's functionality.
-
-    1- In order to log into an existing account the client must provide `username` and `password`:
-      {
-        "username": "Captain Marvel",
-        "password": "foobar"
-      }
-
-    2- On SUCCESSFUL login,
-      the response body should have `message` and `token`:
-      {
-        "message": "welcome, Captain Marvel",
-        "token": "eyJhbGciOiJIUzI ... ETC ... vUPjZYDSa46Nwz8"
-      }
-
-    3- On FAILED login due to `username` or `password` missing from the request body,
-      the response body should include a string exactly as follows: "username and password required".
-
-    4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
-      the response body should include a string exactly as follows: "invalid credentials".
-  */
-
 
 module.exports = router;
