@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
 
-const Users = require('../users-model.js')
+const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
 router.post('/register', (req, res, next) => {
