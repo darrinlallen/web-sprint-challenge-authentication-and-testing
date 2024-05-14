@@ -12,7 +12,7 @@ router.post('/register', (req, res, next) => {
   Users.add(user)
     .then(saved => {
       res.status(201).json({
-        message: `Great to have you with us, ${saved.username}`
+        message: `Great to have you with us, ${saved.id}`
       })
     })
     .catch(next) // our custom err handling middleware will trap this
