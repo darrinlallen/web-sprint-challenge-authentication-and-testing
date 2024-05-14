@@ -11,9 +11,7 @@ router.post('/register', (req, res, next) => {
 
   Users.add(user)
     .then(saved => {
-      res.status(201).json({
-        message: `Great to have you with us, ${saved.id}`
-      })
+      res.status(201).json({saved})
     })
     .catch(next) // our custom err handling middleware will trap this
 })
@@ -28,32 +26,13 @@ router.post('/login', (req, res, next) => {
         // this is the critical line. Session saved, cookie set on client:
         req.session.user = user
         res.status(200).json({
-          message: `Welcome back ${user.username}, have a cookie!`,
-        })
+          message: `welcome, ${user.username}`})
       } else {
         next({ status: 401, message: 'Invalid Credentials' })
       }
     })
     .catch(next)
 })
-
-router.get('/logout', (req, res) => {
-  if (req.session.user) {
-    const { username } = req.session.user
-    req.session.destroy(err => {
-      if (err) {
-        res.json({ message: `You can never leave, ${username}...` })
-      } else {
-        // the following line is optional: compliant browsers will delete the cookie from their storage
-        res.set('Set-Cookie', 'monkey=; SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00')
-        res.json({ message: `Bye ${username}, thanks for playing` })
-      }
-    })
-  } else {
-    res.json({ message: 'Excuse me, do I know you?' })
-  }
-})
-
 
   /*
     IMPLEMENT
