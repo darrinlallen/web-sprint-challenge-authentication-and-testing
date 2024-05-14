@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
-const restrictMe = require('../middleware/restricted.js')
+const restricted = require('../middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
@@ -17,7 +17,7 @@ router.post('/register', async (req, res, next) => {
     }
 
     // Call restrictMe middleware
-    restrictMe(req, res, async () => {
+    restricted(req, res, async () => {
       // This function is called when restrictMe middleware calls next()
       // Now you're back in the route handler
 

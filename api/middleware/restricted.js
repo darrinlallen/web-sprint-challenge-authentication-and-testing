@@ -1,4 +1,4 @@
-const restrictMe = (req, res, next) => {
+const restricted = (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -12,4 +12,4 @@ const restrictMe = (req, res, next) => {
   }
 };
 
-module.exports = restrictMe;
+module.exports = restricted;
