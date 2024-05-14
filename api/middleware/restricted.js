@@ -2,7 +2,7 @@ module.exports = (req, res, next) => {
   next();
   /*
     IMPLEMENT
-
+random
     1- On valid token in the Authorization header, call next.
 
     2- On missing token in the Authorization header,
