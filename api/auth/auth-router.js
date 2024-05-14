@@ -16,23 +16,26 @@ router.post('/register', restrictMe,  (req, res, next) => {
     .catch(next) // our custom err handling middleware will trap this
 })
 
-router.post('/login', (req, res, next) => {
-  let { username, password } = req.body
+// for endpoints beginning with /api/auth
+router.post('/register', restrictMe, (req, res, next) => {
+  let user = req.body;
+  const hash = bcrypt.hashSync(user.password, 8); // 2 ^ n
+  user.password = hash;
 
-  Users.findBy({ username })
-    .first()
-    .then(user => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        // this is the critical line. Session saved, cookie set on client:
-        req.session.user = user
-        res.status(200).json({
-          message: `welcome, ${user.username}`})
-      } else {
-        next({ status: 401, message: 'Invalid Credentials' })
-      }
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json({ saved });
     })
-    .catch(next)
-})
+    .catch(error => {
+      // Check if the error is related to a duplicate username
+      if (error.message.includes('duplicate key value violates unique constraint')) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+      // If it's another type of error, pass it to the error handling middleware
+      next(error);
+    });
+});
+
 
   /*
     IMPLEMENT
