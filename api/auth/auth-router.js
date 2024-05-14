@@ -1,7 +1,60 @@
-const router = require('express').Router();
+const router = require('express').Router()
+const bcrypt = require('bcryptjs')
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+const Users = require('../users-model.js')
+
+// for endpoints beginning with /api/auth
+router.post('api/auth/register', (req, res, next) => {
+  let user = req.body
+  const hash = bcrypt.hashSync(user.password, 8) // 2 ^ n
+  user.password = hash
+
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json({
+        message: `Great to have you with us, ${saved.username}`
+      })
+    })
+    .catch(next) // our custom err handling middleware will trap this
+})
+
+router.post('api/auth/login', (req, res, next) => {
+  let { username, password } = req.body
+
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        // this is the critical line. Session saved, cookie set on client:
+        req.session.user = user
+        res.status(200).json({
+          message: `Welcome back ${user.username}, have a cookie!`,
+        })
+      } else {
+        next({ status: 401, message: 'Invalid Credentials' })
+      }
+    })
+    .catch(next)
+})
+
+router.get('/logout', (req, res) => {
+  if (req.session.user) {
+    const { username } = req.session.user
+    req.session.destroy(err => {
+      if (err) {
+        res.json({ message: `You can never leave, ${username}...` })
+      } else {
+        // the following line is optional: compliant browsers will delete the cookie from their storage
+        res.set('Set-Cookie', 'monkey=; SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00')
+        res.json({ message: `Bye ${username}, thanks for playing` })
+      }
+    })
+  } else {
+    res.json({ message: 'Excuse me, do I know you?' })
+  }
+})
+
+
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -27,10 +80,6 @@ router.post('/register', (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
-
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -54,6 +103,6 @@ router.post('/login', (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+
 
 module.exports = router;
