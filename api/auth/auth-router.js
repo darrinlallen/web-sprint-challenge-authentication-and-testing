@@ -4,7 +4,7 @@ const router = require('express').Router();
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
-router.post('/register', (req, res, next) => {
+router.post('/register', restricted,  (req, res, next) => {
   let user = req.body
   const hash = bcrypt.hashSync(user.password, 8) // 2 ^ n
   user.password = hash
