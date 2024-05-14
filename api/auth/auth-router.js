@@ -13,7 +13,7 @@ router.post('/register', (req, res, next) => {
     .then(saved => {
       res.status(201).json(saved)
     })
-    .catch(next) // our custom err handling middleware will trap this
+    .catch(res.json({message: `username taken`})) // our custom err handling middleware will trap this
 })
 
 router.post('/login', (req, res, next) => {
