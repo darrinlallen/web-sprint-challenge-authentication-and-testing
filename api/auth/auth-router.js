@@ -4,18 +4,27 @@ const restrictMe = require('../middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
+
 router.post('/register', async (req, res, next) => {
   try {
+    const { username, password } = req.body;
+
+    // Check if the username already exists in the users table
+    const existingUser = await Users.findBy({ username });
+    if (existingUser) {
+      // If the username exists, respond with a "username taken" message
+      return res.status(400).json({ message: 'Username already taken' });
+    }
+
     // Call restrictMe middleware
     restrictMe(req, res, async () => {
       // This function is called when restrictMe middleware calls next()
       // Now you're back in the route handler
-      const user = req.body;
-      const hash = await bcrypt.hash(user.password, 8); // Hash the password asynchronously
-      user.password = hash;
+      const hash = await bcrypt.hash(password, 8); // Hash the password asynchronously
+      const newUser = { username, password: hash };
 
       // Add user to the database
-      const savedUser = await Users.add(user);
+      const savedUser = await Users.add(newUser);
 
       // Respond with the saved user
       res.status(201).json(savedUser);
@@ -26,6 +35,24 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
+router.post('/login', (req, res, next) => {
+  let { username, password } = req.body;
+
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        // Session saved, cookie set on client:
+        req.session.user = user;
+        res.status(200).json({
+          message: `Welcome, ${user.username}`
+        });
+      } else {
+        next({ status: 401, message: 'Invalid Credentials' });
+      }
+    })
+    .catch(next);
+});
 
 router.post('/login', (req, res, next) => {
   let { username, password } = req.body

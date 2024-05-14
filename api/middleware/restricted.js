@@ -1,5 +1,7 @@
 const restrictMe = (req, res, next) => {
-  if (!req.username || !req.password) {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
     // Create an error object and pass it to next()
     const error = new Error('Username and password are required');
     error.status = 400; // Set status code for bad request
