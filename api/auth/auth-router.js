@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
-const restrict = require('./middleware/restricted.js')
+const restrict = require('../middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
