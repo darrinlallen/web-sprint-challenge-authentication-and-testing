@@ -1,10 +1,10 @@
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
-
+const restrict = require('./middleware/restricted.js')
 const Users = require('./users-model.js')
 
 // for endpoints beginning with /api/auth
-router.post('/register', restricted,  (req, res, next) => {
+router.post('/register', restrict,  (req, res, next) => {
   let user = req.body
   const hash = bcrypt.hashSync(user.password, 8) // 2 ^ n
   user.password = hash
