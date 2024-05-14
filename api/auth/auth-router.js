@@ -20,7 +20,9 @@ router.post('/register', async (req, res, next) => {
     restrictMe(req, res, async () => {
       // This function is called when restrictMe middleware calls next()
       // Now you're back in the route handler
-      const hash = await bcrypt.hash(password, 8); // Hash the password asynchronously
+
+      // Hash the password asynchronously
+      const hash = await bcrypt.hash(password, 8);
       const newUser = { username, password: hash };
 
       // Add user to the database
