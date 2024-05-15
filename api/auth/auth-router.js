@@ -63,7 +63,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     // If username and password are correct, generate JWT token
-   const token = '08EQZ8EQukb'
+   const token = req.headers.authorization
 
     // Send the JWT token in the response
     res.status(200).json({ message: 'Login successful', token});
