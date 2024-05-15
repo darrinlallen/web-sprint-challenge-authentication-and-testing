@@ -13,12 +13,12 @@ router.post('/register', async (req, res, next) => {
     }
 
     // Check if the username already exists in the users table
-    const existingUser = await Users.findBy({ username });
+    /*const existingUser = await Users.findBy({ username });
     if (existingUser) {
       // If the username exists, respond with a "username taken" message
       return res.status(400).json({ message: 'Username already taken' });
     }
-
+*/
     // Hash the password asynchronously
     const hash = await bcrypt.hash(password, 8);
     const newUser = { username, password: hash };
