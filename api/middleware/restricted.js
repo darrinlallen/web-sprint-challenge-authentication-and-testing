@@ -29,16 +29,15 @@ const restrict = (req, res, next) => {
 
     if (!verifyToken(token)) {
       // If the token is invalid, respond with a 401 status and a message indicating that the token is invalid
-     // return res.status(401).json({ message: 'token invalid' });
-     next()
+      return res.status(401).json({ message: 'token invalid' });
     }
 
     // If the token is valid, call next() to pass control to the next middleware/route handler
     next();
   } catch (error) {
     // If an error occurs, pass it to the error handling middleware
-    return res.status(401).json({ message: 'token invalid' })
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-module.exports = restrict
+module.exports = restrict;
