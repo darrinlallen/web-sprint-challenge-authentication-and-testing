@@ -47,7 +47,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     // Retrieve the user from the database based on the provided username
-    const [user] = await Users.findBy({ username }).first();
+    const user = await Users.findBy({ username }).first();
 
     if (!user) {
 
