@@ -50,7 +50,6 @@ router.post('/login', async (req, res, next) => {
     const user = await Users.findBy({ username }).first();
 
     if (!user) {
-
       // If username doesn't exist
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -63,10 +62,10 @@ router.post('/login', async (req, res, next) => {
     }
 
     // If username and password are correct, generate JWT token
-   const token = 1;
+    const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Send the JWT token in the response
-    res.status(200).json({ message: 'Login successful', token});
+    res.status(200).json({ message: 'Login successful', token });
     
   } catch (error) {
     // Pass the error to the error handling middleware
