@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
   // Assume verifyToken(token) is a function that validates the token
 
   if (!verifyToken(token)) {
-    return res.status(401).json({ message: 'Token invalid' });
+    return res.status(401).json({ message: 'token invalid' });
   }
 
   // If the token is valid, call next() to pass control to the next middleware/route handler
