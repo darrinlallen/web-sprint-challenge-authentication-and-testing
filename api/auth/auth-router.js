@@ -47,8 +47,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     // Retrieve the user from the database based on the provided username
-    const user = await Users.findBy({ username }).first();
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const [user] = await Users.findBy({ username }).first();
 
     if (!user) {
       // If username doesn't exist
@@ -63,10 +62,10 @@ router.post('/login', async (req, res, next) => {
     }
 
     // If username and password are correct, generate JWT token
-   //const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Send the JWT token in the response
-    res.status(200).json({ message: 'Login successful'});
+    res.status(200).json({ message: 'Login successful', token});
     
   } catch (error) {
     // Pass the error to the error handling middleware
