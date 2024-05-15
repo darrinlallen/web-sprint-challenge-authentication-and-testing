@@ -2,7 +2,9 @@ const restrict = (req, res, next) => {
   try {
     // Check if the request contains a valid token
     const token = req.headers.authorization;
-
+    if (token){
+      next()
+    }
     if (!token) {
       return res.status(401).json({ message: 'token required' });
     }
