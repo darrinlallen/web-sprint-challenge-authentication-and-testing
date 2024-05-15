@@ -23,7 +23,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Apply token verification middleware to restrict access
-router.get('/', verifyToken, (req, res) => {
+router.get('/', verifyToken, (req, res, next) => {
   res.status(200).json(jokes);
 });
 

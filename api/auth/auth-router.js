@@ -58,9 +58,9 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    if (isValidPassword && user){
-    return res.status(200);
-    }
+    // If username and password are correct, respond with a success message
+    return res.status(200).json({ message: 'Login successful', user: { username: user.username } });
+    
   } catch (error) {
     // Pass the error to the error handling middleware
     next(error);
