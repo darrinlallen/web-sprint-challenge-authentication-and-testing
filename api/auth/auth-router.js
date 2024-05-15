@@ -26,14 +26,14 @@ router.post('/register', restrictMe, async (req, res, next) => {
     const { username, password } = req.body;
 
     // Check if the username already exists in the users table
-    const existingUser =  Users.findBy({ username });
+    const existingUser = await Users.findBy({ username });
     if (existingUser) {
       // If the username exists, respond with a "username taken" message
       return res.status(400).json({ message: 'Username already taken' });
     }
 
     // Hash the password asynchronously
-    const hash = bcrypt.hash(password, 8);
+    const hash = await bcrypt.hash(password, 8);
     const newUser = { username, password: hash };
 
     // Add user to the database
@@ -48,19 +48,19 @@ router.post('/register', restrictMe, async (req, res, next) => {
 });
 
 // Route handler for user login
-router.post('/login',  async(req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
     let { username, password } = req.body;
 
     // Retrieve the user from the database based on the provided username
-    const user =  Users.findBy({ username }).first();
+    const user = await Users.findBy({ username }).first();
     if (!user) {
       // If username doesn't exist
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Compare the provided password with the hashed password in the database
-    const isValidPassword = bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       // If password is incorrect
       return res.status(401).json({ message: 'Invalid credentials' });
