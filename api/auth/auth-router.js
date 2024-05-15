@@ -60,7 +60,7 @@ router.post('/login', async (req, res, next) => {
 
     // Session saved, cookie set on client
     req.session.user = user;
-    return res.status(200).json({ message: `Welcome, ${user.username}` });
+    return res.status(200);
   } catch (error) {
     // Pass the error to the error handling middleware
     next(error);
