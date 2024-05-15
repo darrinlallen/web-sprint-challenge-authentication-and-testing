@@ -66,7 +66,7 @@ router.post('/login', async (req, res, next) => {
    const token = 8
 
     // Send the JWT token in the response
-    res.status(200).json({ message: 'Login successful'});
+    res.status(200).json({ message: 'Login successful', token});
     
   } catch (error) {
     // Pass the error to the error handling middleware
