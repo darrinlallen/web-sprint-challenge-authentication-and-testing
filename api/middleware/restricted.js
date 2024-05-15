@@ -4,17 +4,15 @@ const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // Token is valid, proceed with the request
-    return true
+    return true;
   } catch (error) {
     // Token verification failed, handle the error
     console.error('Token verification failed:', error.message);
     // Respond with an appropriate error message
-    return false
+    return false;
   }
-  
 };
 
-module.exports = verifyToken;
 const restrict = (req, res, next) => {
   try {
     // Check if the request contains a valid token
@@ -42,4 +40,4 @@ const restrict = (req, res, next) => {
   }
 };
 
-module.exports = restrict;
+module.exports = { verifyToken, restrict };
