@@ -7,11 +7,16 @@ const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized: No token provided' });
+    return res.status(401).json({ message: 'Token required' });
   }
 
   // Here, you would implement your logic to verify the token
   // For example, you can use a JWT library to decode and verify the token
+  // Assume verifyToken(token) is a function that validates the token
+
+  if (!verifyToken(token)) {
+    return res.status(401).json({ message: 'Token invalid' });
+  }
 
   // If the token is valid, call next() to pass control to the next middleware/route handler
   next();
@@ -23,3 +28,4 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 module.exports = router;
+
