@@ -21,7 +21,7 @@ const restrictMe = (req, res, next) => {
 };
 
 // Route handler for user registration
-router.post('/register', restrictMe, async (req, res, next) => {
+router.post('/register',  async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -49,6 +49,7 @@ router.post('/register', restrictMe, async (req, res, next) => {
 
 // Route handler for user login
 router.post('/login', async (req, res, next) => {
+  const token = req.headers.token;
   try {
     let { username, password } = req.body;
 
