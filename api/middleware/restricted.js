@@ -1,10 +1,26 @@
+const jwt = require('jsonwebtoken');
+
+const verifyToken = (token) => {
+  try {
+    // Verify the token using the JWT library
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // If verification is successful, return true
+    return true;
+  } catch (error) {
+    // If verification fails (e.g., token is invalid or expired), return false
+    return false;
+  }
+};
+
+module.exports = verifyToken;
+
 const restrict = (req, res, next) => {
   try {
     // Check if the request contains a valid token
     const token = req.headers.authorization;
-    if (token){
-      next()
-    }
+
+    // If there is no token, respond with a 401 status and a message stating that a token is required
     if (!token) {
       return res.status(401).json({ message: 'token required' });
     }
@@ -14,6 +30,7 @@ const restrict = (req, res, next) => {
     // Assume verifyToken(token) is a function that validates the token
 
     if (!verifyToken(token)) {
+      // If the token is invalid, respond with a 401 status and a message indicating that the token is invalid
       return res.status(401).json({ message: 'token invalid' });
     }
 
@@ -24,3 +41,4 @@ const restrict = (req, res, next) => {
     next(error);
   }
 };
+
