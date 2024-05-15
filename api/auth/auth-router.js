@@ -58,9 +58,9 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Session saved, cookie set on client
-    req.session.user = user;
+    if (isValidPassword && user){
     return res.status(200);
+    }
   } catch (error) {
     // Pass the error to the error handling middleware
     next(error);
