@@ -40,4 +40,4 @@ const restrict = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken, restrict };
+module.exports = restrict
