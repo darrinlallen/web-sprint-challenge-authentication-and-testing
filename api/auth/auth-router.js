@@ -2,28 +2,15 @@ const bcrypt = require('bcryptjs');
 const router = require('express').Router();
 const Users = require('./users-model.js');
 
-// Middleware to check if username and password are provided
-const restrictMe = (req, res, next) => {
+// Route handler for user registration
+router.post('/register', async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    // Perform validation or checks here
+    // Check if the username or password is missing
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
-
-    // If validation passes, call next() to pass control to the next middleware/route handler
-    next();
-  } catch (error) {
-    // If an error occurs, pass it to the error handling middleware
-    next(error);
-  }
-};
-
-// Route handler for user registration
-router.post('/register',  async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
 
     // Check if the username already exists in the users table
     const existingUser = await Users.findBy({ username });
@@ -49,9 +36,13 @@ router.post('/register',  async (req, res, next) => {
 
 // Route handler for user login
 router.post('/login', async (req, res, next) => {
-  const token = req.headers.token;
   try {
-    let { username, password } = req.body;
+    const { username, password } = req.body;
+
+    // Check if the username or password is missing
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
 
     // Retrieve the user from the database based on the provided username
     const user = await Users.findBy({ username }).first();
