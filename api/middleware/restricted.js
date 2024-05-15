@@ -1,4 +1,4 @@
-const verifyToken = (req, res, next) => {
+const restricted = (req, res, next) => {
   try {
     // Check if the request contains a valid token
     const token = req.headers.authorization;
