@@ -21,7 +21,7 @@ const restrictMe = (req, res, next) => {
 };
 
 // Route handler for user registration
-router.post('/register', restrictMe, (req, res, next) => {
+router.post('/register', restrictMe, async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -37,7 +37,7 @@ router.post('/register', restrictMe, (req, res, next) => {
     const newUser = { username, password: hash };
 
     // Add user to the database
-    const savedUser = Users.add(newUser);
+    const savedUser = await Users.add(newUser);
 
     // Respond with the saved user
     res.status(201).json(savedUser);
@@ -48,7 +48,7 @@ router.post('/register', restrictMe, (req, res, next) => {
 });
 
 // Route handler for user login
-router.post('/login',  (req, res, next) => {
+router.post('/login',  async(req, res, next) => {
   try {
     let { username, password } = req.body;
 
