@@ -14,7 +14,6 @@ const verifyToken = (token) => {
 };
 
 module.exports = verifyToken;
-
 const restrict = (req, res, next) => {
   try {
     // Check if the request contains a valid token
@@ -42,3 +41,4 @@ const restrict = (req, res, next) => {
   }
 };
 
+module.exports = restrict;
