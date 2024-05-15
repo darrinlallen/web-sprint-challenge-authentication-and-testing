@@ -2,15 +2,16 @@ const jwt = require('jsonwebtoken');
 
 const verifyToken = (token) => {
   try {
-    // Verify the token using the JWT library
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // If verification is successful, return true
-    return true;
+    // Token is valid, proceed with the request
+    return true
   } catch (error) {
-    // If verification fails (e.g., token is invalid or expired), return false
-    return false;
+    // Token verification failed, handle the error
+    console.error('Token verification failed:', error.message);
+    // Respond with an appropriate error message
+    return false
   }
+  
 };
 
 module.exports = verifyToken;
