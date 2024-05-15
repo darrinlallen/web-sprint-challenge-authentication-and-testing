@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const router = require('express').Router();
 const Users = require('./users-model.js');
+const jwt = require('jsonwebtoken');
 
 // Route handler for user registration
 router.post('/register', async (req, res, next) => {
@@ -35,6 +36,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 // Route handler for user login
+// Route handler for user login
 router.post('/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -58,8 +60,11 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // If username and password are correct, respond with a success message
-    return res.status(200).json({ message: 'Login successful', user: { username: user.username } });
+    // If username and password are correct, generate JWT token
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Send the JWT token in the response
+    res.status(200).json({ message: 'Login successful', token });
     
   } catch (error) {
     // Pass the error to the error handling middleware
