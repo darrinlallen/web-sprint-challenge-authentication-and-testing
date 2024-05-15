@@ -1,6 +1,3 @@
-const router = require('express').Router();
-const jokes = require('./jokes-data');
-
 // Token verification middleware
 const verifyToken = (req, res, next) => {
   try {
@@ -26,16 +23,3 @@ const verifyToken = (req, res, next) => {
     next(error);
   }
 };
-
-// Apply token verification middleware to restrict access
-router.get('/', verifyToken, (req, res, next) => {
-  try {
-    // Send the jokes data in JSON format
-    res.status(200).json(jokes);
-  } catch (error) {
-    // If an error occurs, pass it to the error handling middleware
-    next(error);
-  }
-});
-
-module.exports = router;
